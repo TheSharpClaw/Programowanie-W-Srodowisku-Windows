@@ -13,7 +13,7 @@ namespace ProgWSrodWin
 {
     public partial class Form1 : Form
     {
-        private SerialPort _serialPort = new SerialPort("COM3", 300, Parity.None, 8, StopBits.One);
+        private SerialPort _serialPort = new SerialPort("COM4", 300, Parity.None, 8, StopBits.One);
         private byte[] _message = { 0xAA };
 
         public Form1()
