@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.Text;
+using System.Linq;
 
 namespace coms
 {
-    public partial class Form1 : System.Windows.Forms.Form
+    public partial class Form1 : Form
     {
-        private string _message;
 
-        public Form1()
+        public byte[] StringToByteArray(string hex)
+        {
+            return Enumerable.Range(0, hex.Length)
+                             .Where(x => x % 2 == 0)
+                             .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                             .ToArray();
+        }
+
+    public Form1()
         {
             InitializeComponent();
         }
@@ -80,10 +88,31 @@ namespace coms
                 MessageBox.Show(ex.Message);
             }
         }
+
         private void SendButton_Click(object sender, EventArgs e)
         {
-            byte[] bytesToSend = Encoding.ASCII.GetBytes(_sendTextBox.Text.ToString());
-            _sendTextBox.Text = "";
+            string message = _sendTextBox.Text.ToString();
+
+            string[] listOfSplittedStrings = message.Split((char)32);
+
+            List<byte> listOfBytesToSend = new List<byte>();
+
+            message = "";
+            
+            for (int i = 0; i <= listOfSplittedStrings.Length - 1; i++)
+            {
+                if (listOfSplittedStrings[i].StartsWith("0x"))
+                {
+                    message += listOfSplittedStrings[i].Substring(2);
+                }
+                else
+                {
+                    MessageBox.Show("Nieprawidłowa ramka. Prawidłowy format wpisywania ramki: 0xFF 0xFF 0xFF itd.");
+                    break;
+                }
+            }
+            
+            byte[] bytesToSend = StringToByteArray(message);
 
             try
             {
@@ -98,6 +127,7 @@ namespace coms
                 MessageBox.Show(ex.Message);
             }
         }
+
         private void ReceiveButton_Click(object sender, EventArgs e)
         {
             byte[] bytesToRead = new byte[_serialPort.BytesToRead];
