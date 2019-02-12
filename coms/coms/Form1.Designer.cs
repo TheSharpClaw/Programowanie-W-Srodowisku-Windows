@@ -202,7 +202,7 @@
             this._modulationGroupBox.Controls.Add(this._modulationQPSKRadioButton);
             this._modulationGroupBox.Location = new System.Drawing.Point(79, 34);
             this._modulationGroupBox.Name = "_modulationGroupBox";
-            this._modulationGroupBox.Size = new System.Drawing.Size(136, 64);
+            this._modulationGroupBox.Size = new System.Drawing.Size(145, 64);
             this._modulationGroupBox.TabIndex = 7;
             this._modulationGroupBox.TabStop = false;
             this._modulationGroupBox.Text = "Modulation";
@@ -254,7 +254,7 @@
             // _FECCheckBox
             // 
             this._FECCheckBox.AutoSize = true;
-            this._FECCheckBox.Location = new System.Drawing.Point(221, 77);
+            this._FECCheckBox.Location = new System.Drawing.Point(230, 77);
             this._FECCheckBox.Name = "_FECCheckBox";
             this._FECCheckBox.Size = new System.Drawing.Size(46, 17);
             this._FECCheckBox.TabIndex = 12;
@@ -263,7 +263,7 @@
             // 
             // _resetButton
             // 
-            this._resetButton.Location = new System.Drawing.Point(283, 76);
+            this._resetButton.Location = new System.Drawing.Point(283, 48);
             this._resetButton.Margin = new System.Windows.Forms.Padding(2);
             this._resetButton.Name = "_resetButton";
             this._resetButton.Size = new System.Drawing.Size(58, 22);

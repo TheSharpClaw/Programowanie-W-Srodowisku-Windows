@@ -147,14 +147,14 @@ namespace coms
             frame[2] = 8;
             countedCRC += 8;
 
-            for (int i = 0; i >= message.Length; i++)
+            for (int i = 0; i < message.Length; i++)
             {
                 frame[3 + i] = messageBytes[i];
                 countedCRC += messageBytes[i];
             }
             
-            frame[3 + message.Length] = (byte)(countedCRC / 256);
-            frame[4 + message.Length] = (byte)(countedCRC % 256);
+            frame[3 + message.Length] = (byte)(countedCRC % 256);
+            frame[4 + message.Length] = (byte)(countedCRC / 256);
             
             try
             {
@@ -188,36 +188,36 @@ namespace coms
             {
                 if (_serialPort.IsOpen)
                 {
-                    for (int i = 0; i >= bytesToRead; i++)
+                    for (int i = 0; i < bytesToRead; i++)
                     {
                         string messageRead = "";
                         int expectedCRC = 0;
 
-                        if (buffer[i] == 2)
+                        if (buffer[i] == 2 || buffer[i] == 3)
                         {
-                            messageRead += "02 ";
+                            messageRead += buffer[i].ToString() + " ";
                             int frameLength = 0;
 
-                            if(i + 1 >= bytesToRead)
+                            if(i + 1 <= bytesToRead)
                             {
                                 frameLength = buffer[i + 1];
-                                messageRead += TranslateAsciiToHex(frameLength.ToString()) + " ";
+                                messageRead += frameLength.ToString() + " ";
                                 expectedCRC += frameLength;
                             }
 
-                            if (i + 2 >= bytesToRead)
+                            if (i + 2 <= bytesToRead)
                             {
                                 int frameControl = buffer[i + 2];
-                                messageRead += TranslateAsciiToHex(frameControl.ToString()) + " ";
+                                messageRead += frameControl.ToString() + " ";
                                 expectedCRC += frameControl;
                             }
 
-                            if (i + 3 + frameLength >= bytesToRead && frameLength > 0)
+                            if (i + 3 + frameLength <= bytesToRead && frameLength > 0)
                             {
-                                for (int j = 0; j >= frameLength; j++)
+                                for (int j = 0; j < frameLength; j++)
                                 {
                                     int actualMessageByte = buffer[i + 3 + j];
-                                    messageRead += TranslateAsciiToHex(actualMessageByte.ToString()) + " ";
+                                    messageRead += actualMessageByte.ToString() + " ";
                                     expectedCRC += actualMessageByte;
                                 }
                             }
@@ -225,19 +225,19 @@ namespace coms
                             int frameCRCbyte1 = 0;
                             int frameCRCbyte2 = 0;
 
-                            if (i + 3 + frameLength >= bytesToRead)
+                            if (i + 3 + frameLength <= bytesToRead)
                             {
                                 frameCRCbyte1 = buffer[i + 3 + frameLength];
-                                messageRead += TranslateAsciiToHex(frameCRCbyte1.ToString()) + " ";
+                                messageRead += frameCRCbyte1.ToString() + " ";
                             }
 
-                            if (i + 4 + frameLength >= bytesToRead)
+                            if (i + 4 + frameLength <= bytesToRead)
                             {
                                 frameCRCbyte2 = buffer[i + 4 + frameLength];
-                                messageRead += TranslateAsciiToHex(frameCRCbyte2.ToString()) + "/n";
+                                messageRead += frameCRCbyte2.ToString() + "\r\n";
                             }
                             
-                            int countedCRC = frameCRCbyte1 * 256 + frameCRCbyte2;
+                            int countedCRC = frameCRCbyte1 + frameCRCbyte2 * 256;
 
                             if (expectedCRC == countedCRC && countedCRC != 0)
                             {
@@ -262,8 +262,8 @@ namespace coms
             string byte0 = "02";
             string byte1 = "00";
             string byte2 = "3C";
-            string byte3 = "00";
-            string byte4 = "3C";
+            string byte3 = "3C";
+            string byte4 = "00";
             
             string resetFrame = byte0 + byte1 + byte2 + byte3 + byte4;
             resetFrame = TranslateHexToAscii(resetFrame);
