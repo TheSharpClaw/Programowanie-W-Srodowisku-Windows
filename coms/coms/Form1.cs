@@ -311,43 +311,51 @@ namespace coms
         //
         private void SendButton_Click(object sender, EventArgs e)
         {
-            byte[] frame = new byte[_byteArrayLength + 6];
-            int frameIndex = 0;
-            int controlSum = 0;
-
-            frame[frameIndex++] = 0x02;
-            frame[frameIndex++] = (byte)(_byteArrayLength + 1);
-            frame[frameIndex++] = _commandCode;
-            frame[frameIndex++] = _firstByte;
-
-            for (int i = 0; i < _byteArrayLength; i++)
-                frame[frameIndex++] = _byteArray[i];
-
-            for (int i = 1; i < _byteArrayLength + 4; i++)
-                controlSum += frame[i];
-
-            frame[frameIndex++] = (byte)(controlSum % 256);
-            frame[frameIndex++] = (byte)(controlSum / 256);
-
-            try
+            if (_sendHexTextBox.Text.Length >= 1)
             {
-                if (_serialPort.IsOpen)
+                byte[] frame = new byte[_byteArrayLength + 6];
+                int frameIndex = 0;
+                int controlSum = 0;
+
+                frame[frameIndex++] = 0x02;
+                frame[frameIndex++] = (byte)(_byteArrayLength + 1);
+                frame[frameIndex++] = _commandCode;
+                frame[frameIndex++] = _firstByte;
+
+                for (int i = 0; i < _byteArrayLength; i++)
+                    frame[frameIndex++] = _byteArray[i];
+
+                for (int i = 1; i < _byteArrayLength + 4; i++)
+                    controlSum += frame[i];
+
+                frame[frameIndex++] = (byte)(controlSum % 256);
+                frame[frameIndex++] = (byte)(controlSum / 256);
+
+                try
                 {
-                    _serialPort.RtsEnable = true;
+                    if (_serialPort.IsOpen)
+                    {
+                        _serialPort.RtsEnable = true;
 
-                    _serialPort.Write(frame, 0, frame.Length);
+                        _serialPort.Write(frame, 0, frame.Length);
 
-                    _serialPort.RtsEnable = false;
-                    _serialPort.BaseStream.Flush();
+                        _serialPort.RtsEnable = false;
+                        //_serialPort.BaseStream.Flush();
 
-                    _sendHexTextBox.Clear();
-                    _sendAsciiTextBox.Clear();
+                        _sendHexTextBox.Clear();
+                        _sendAsciiTextBox.Clear();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
                 }
             }
-            catch(Exception ex)
+            else
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Brak danych do wysłania!");
             }
+            
         }
         //
         // Messages receiving by thread
@@ -360,7 +368,7 @@ namespace coms
                 
                 _receiveHistoryTextBox.Invoke(new Action(delegate ()
                 {
-                    _receiveHistoryTextBox.AppendText(_receiveLastTextBox.Text + "\r\n");
+                    _receiveHistoryTextBox.AppendText(_receiveLastTextBox.Text);
                 }));
 
                 _receiveLastTextBox.Invoke(new Action(delegate ()
@@ -387,7 +395,7 @@ namespace coms
         {
             try
             {
-                _receiveHistoryTextBox.AppendText(_receiveLastTextBox.Text + "\r\n");
+                _receiveHistoryTextBox.AppendText(_receiveLastTextBox.Text);
                 _receiveLastTextBox.Text = _serialPort.ReadExisting();
             }
             catch (TimeoutException)
